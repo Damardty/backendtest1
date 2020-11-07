@@ -4,6 +4,7 @@ import cors from 'cors';
 import http from 'http';
 import config from './environment';
 import routes from './routes';
+import mongoose from 'mongoose';
 
 const app = express();
 
@@ -13,6 +14,20 @@ app.use(bodyParser.urlencoded({extended: false}));
 routes(app);
 
 const server =  http.createServer(app);
+
+mongoose.connect(config.mongo_uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true
+})
+const database = mongoose.connection;
+database.once("open", async () => {
+    console.log("Connected to database");
+});
+database.on("error", () => {
+    console.log("Error connecting to database");
+});
 
 /*
 app.get('/index', (req, res) => {
